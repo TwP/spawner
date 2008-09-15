@@ -1,3 +1,9 @@
+== 1.0.1 / 2008-09-15
+
+* 1 minor enhancement
+  * Now returns errors back up to the spawner if the child cannot exec
+    the desired process
+
 == 1.0.0 / 2008-09-14
 
 * 1 major enhancement

@@ -19,7 +19,7 @@ begin require 'fastthread'; rescue LoadError; end
 #
 class Spawner
 
-  VERSION = '1.0.0'
+  VERSION = '1.0.1'
 
   @dev_null = test(?e, "/dev/null") ? "/dev/null" : "NUL:"
 
@@ -264,20 +264,27 @@ class Spawner
             loop do
               begin
                 io = IO.popen("#{@ruby} #{@tmp.path}", 'r')
-                cid = io.gets.to_i
+                cid = Integer(line = io.gets)
 
                 @cids.sync {@cids << cid} if cid > 0
                 Process.wait cid
-              rescue Exception => e
-                STDERR.puts e.inspect
-                STDERR.puts e.backtrace.join("\n")
+              rescue Exception => err
+                child_err = Marshal.load(line) rescue nil
+                err = child_err unless child_err.nil?
+
+                STDERR.puts err.inspect
+                STDERR.puts err.backtrace.join("\n")
                 throw :die
               ensure
+                line = io.read
+                child_err = Marshal.load(line) rescue nil
+
                 io.close rescue nil
                 @cids.sync {
                   @cids.delete cid
-                  throw :die unless @cids.length < @spawn
+                  throw :die unless @cids.length < @spawn or child_err
                 }
+                raise child_err unless child_err.nil?
               end
 
               throw :die if @stop
@@ -321,19 +328,26 @@ class Spawner
 
         Dir.chdir cwd if cwd
         env.each {|k,v| ENV[k.to_s] = v.to_s} if env
-      rescue Exception => e
-        STDERR.warn e
-        abort
+      rescue Exception => err
+        STDOUT.puts Marshal.dump(err)
+        STDOUT.flush
+        exit
       end
 
-      STDOUT.puts Process.pid
-      STDOUT.flush
+      parent = STDOUT.dup
+      parent.puts Process.pid
+      parent.flush
 
       STDIN.reopen stdin, 'r'
       STDOUT.reopen stdout, 'a'
       STDERR.reopen stderr, 'a'
 
-      exec *argv
+      begin
+        exec *argv
+      rescue Exception => err
+        parent.puts Marshal.dump(err)
+        parent.flush
+      end
     PROG
 
     tmp.close
