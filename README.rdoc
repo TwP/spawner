@@ -1,32 +1,46 @@
-spawner
-    by FIXME (your name)
-    FIXME (url)
+Spawner
+  by Tim Pease
+  http://codeforpeople.rubyforge.org/spawner
 
 == DESCRIPTION:
 
-FIXME (describe your package)
+Spawn multiple child processes from Ruby and re-spawn those processes if they die.
 
-== FEATURES/PROBLEMS:
+Spawner works on Mac OS X, Linux, Windows, Solaris, AIX -- anywhere that Ruby can run. It is useful for load testing other applications or just keeping things alive. The Spawner class allows the number of child processes to be changed dynamiclly so they can be brought up and down as needed without restarting the spawner.
 
-* FIXME (list of features or problems)
+There is also a handy command line spawner app that's really useful for load testing services -- spawn twenty clients and see how things hold up.
 
 == SYNOPSIS:
 
-  FIXME (code sample of usage)
+Start three 'foo' processes and re-spawn immediately when one dies.
 
-== REQUIREMENTS:
+  spawner = Spawner.new( 'foo', :spawn => 3 )
+  spawner.start
 
-* FIXME (list of requirements)
+Start two 'bar' processes, pause for 10 seconds before re-spawning, and capture output to a file.
+
+  spawner = Spawner.new( 'bar', :spawn = 2, :pause => 10, :stdout => 'stdout.txt' )
+  spawner.start
+
+Start 10 'baz' process and kill off one process each minute until none are left running.
+
+  spawner = Spawner.new( 'baz', :spawn => 10 )
+  spawner.start
+
+  until (spawner.spawn == 0)
+    sleep 60
+    spawner.spawn -= 1
+  end
 
 == INSTALL:
 
-* FIXME (sudo gem install, anything else)
+  sudo gem install spawner
 
 == LICENSE:
 
-(The MIT License)
+The MIT License
 
-Copyright (c) 2008 FIXME (different license?)
+Copyright (c) 2008
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

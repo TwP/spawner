@@ -61,6 +61,7 @@ class Spawner
   #    :pause   => wait time (in seconds) before respawning after termination
   #    :ruby    => the Ruby interpreter to use when spawning children
   #    :env     => a hash for the child process environment
+  #    :cwd     => the current working directory to use for the child process
   #    :stdin   => stdin child processes will read from
   #    :stdout  => stdout child processes will write to
   #    :stderr  => stderr child processes will write to
