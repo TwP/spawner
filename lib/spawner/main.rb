@@ -27,8 +27,9 @@ class Spawner::Main
   #
   def run( args )
     parse(args)
+    args << config
 
-    spawner = ::Spawner.new(*args, config)
+    spawner = ::Spawner.new(*args)
     Signal.trap('INT') { spawner.stop }
 
     count = config[:spawn] || 1
