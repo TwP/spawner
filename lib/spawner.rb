@@ -19,7 +19,7 @@ begin require 'fastthread'; rescue LoadError; end
 #
 class Spawner
 
-  VERSION = '1.0.1'
+  VERSION = '1.0.2'
 
   @dev_null = test(?e, "/dev/null") ? "/dev/null" : "NUL:"
 
