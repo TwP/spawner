@@ -268,6 +268,7 @@ class Spawner
 
                 @cids.sync {@cids << cid} if cid > 0
                 Process.wait cid
+              rescue SystemCallError    # if the child has already died
               rescue Exception => err
                 child_err = Marshal.load(line) rescue nil
                 err = child_err unless child_err.nil?
